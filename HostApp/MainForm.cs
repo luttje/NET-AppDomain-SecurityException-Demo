@@ -12,16 +12,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Security.Permissions;
-using Mono.Cecil;
 using SharedInterfaces;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Windows.Forms.Integration;
+using Mono.Cecil;
 
 namespace HostApp
 {
     public partial class MainForm : Form
     {
-        public const string PLUGIN_DIRECTORY_PATH = @".\Plugins";
+        public const string PLUGIN_DIRECTORY_PATH = @"Plugins";
 
         private bool isUsingWorkaround = false;
         private bool isEnablingProblems = false;
@@ -130,6 +131,7 @@ namespace HostApp
             permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, pluginDirectoryPath));
             permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, pluginDirectoryPath));
             permissions.AddPermission(new UIPermission(UIPermissionWindow.AllWindows));
+            permissions.AddPermission(new ReflectionPermission(ReflectionPermissionFlag.MemberAccess));
 
             var sandboxDomain = AppDomain.CreateDomain("Sandbox", null, sandboxDomainSetup, permissions);
             var pluginAssembly = AssemblyDefinition.ReadAssembly(pluginAssemblyPath);
@@ -181,14 +183,16 @@ namespace HostApp
             foreach (var mappingControlWithFactory in sortedFactories)
             {
                 var mappingControlTypeName = mappingControlWithFactory.Key;
-                var mappingControlFactory = mappingControlWithFactory.Value;
-                var mappingControl = mappingControlFactory.CreateInstance<Control>();
+                var mappingControlFactory = mappingControlWithFactory.Value as AppDomainMappingControlFactory; // hacks for quick testing
+                var controlBuilder = new CrossDomainPluginControlBuilder(mappingControlFactory.appDomain, mappingControlFactory.pluginAssemblyPath, mappingControlTypeName);
+                var mappingControl = controlBuilder.CreatePluginControl();
+                //var pluginMappingControl = mappingControlFactory.CreateInstance<Control>();
 
-                if (mappingControl is AbstractPluginUserControl abstractPluginControl)
-                {
-                    abstractPluginControl.AutoSize = true;
-                    mappingControl = new PluginHostControl(abstractPluginControl);
-                }
+                //if (mappingControl is AbstractPluginUserControl abstractPluginControl)
+                //{
+                //    abstractPluginControl.AutoSize = true;
+                //    mappingControl = new PluginHostControl(abstractPluginControl);
+                //}
 
                 // Give the form a moment to get to know the parent size
                 mappingControl.Visible = false;

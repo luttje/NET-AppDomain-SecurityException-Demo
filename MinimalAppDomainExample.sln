@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedInterfaces", "SharedI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostApp", "HostApp\HostApp.csproj", "{7A68203C-62DB-41B9-929F-A51B28451E11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientPlugin", "ClientPlugin\ClientPlugin.csproj", "{7978ACAE-6F65-472E-BA96-9C6D5FF79375}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientPlugin", "ClientPlugin\ClientPlugin.csproj", "{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{7A68203C-62DB-41B9-929F-A51B28451E11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A68203C-62DB-41B9-929F-A51B28451E11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A68203C-62DB-41B9-929F-A51B28451E11}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7978ACAE-6F65-472E-BA96-9C6D5FF79375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7978ACAE-6F65-472E-BA96-9C6D5FF79375}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7978ACAE-6F65-472E-BA96-9C6D5FF79375}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7978ACAE-6F65-472E-BA96-9C6D5FF79375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

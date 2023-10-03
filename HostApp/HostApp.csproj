@@ -33,8 +33,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.AddIn.Contract" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Presentation" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,14 +48,10 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InternalUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InternalUserControl.Designer.cs">
-      <DependentUpon>InternalUserControl.cs</DependentUpon>
-    </Compile>
+    <Compile Include="CrossDomainPluginControlBuilder.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,17 +61,8 @@
     <Compile Include="MappingControlFactory.cs" />
     <Compile Include="MappingControlRepository.cs" />
     <Compile Include="Native.cs" />
-    <Compile Include="PluginHostControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="PluginHostControl.Designer.cs">
-      <DependentUpon>PluginHostControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="InternalUserControl.resx">
-      <DependentUpon>InternalUserControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

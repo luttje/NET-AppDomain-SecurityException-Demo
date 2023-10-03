@@ -56,8 +56,8 @@ namespace HostApp
     /// </summary>
     public class AppDomainMappingControlFactory : MappingControlFactory
     {
-        private AppDomain appDomain;
-        private string pluginAssemblyPath;
+        public AppDomain appDomain;
+        public string pluginAssemblyPath;
         private string controlTypeName;
 
         public AppDomainMappingControlFactory(string title, int order, AppDomain appDomain, string pluginAssemblyPath, string controlTypeName)

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ClientPlugin")]
+[assembly: AssemblyTitle("PluginLoader")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ClientPlugin")]
+[assembly: AssemblyProduct("PluginLoader")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("3fbe1b2b-4e5b-42d8-ac10-c3492e384e07")]
+[assembly: Guid("28fd937c-cca7-4e85-a29b-d723e8390e51")]
 
 // Version information for an assembly consists of the following four values:
 //

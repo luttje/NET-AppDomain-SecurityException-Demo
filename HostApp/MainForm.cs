@@ -1,34 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
 using System.Security;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Security.Permissions;
-using Mono.Cecil;
-using SharedInterfaces;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Windows.Controls;
 
 namespace HostApp
 {
     public partial class MainForm : Form
     {
-        public const string PLUGIN_DIRECTORY_PATH = @".\Plugins";
+        public const string PLUGIN_DIRECTORY_PATH = @"Plugins";
 
         private bool isUsingWorkaround = false;
         private bool isEnablingProblems = false;
+        
+        private System.Windows.Forms.TabControl tbcPlugins;
+
+        private IList<PluginHostProxy> proxiesToDispose = new List<PluginHostProxy>();
 
         public MainForm()
         {
             InitializeComponent();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            foreach (var disposable in proxiesToDispose)
+            {
+                disposable.Disposing -= PluginHost_Disposing;
+                disposable.Dispose();
+            }
+
+            base.OnFormClosed(e);
         }
 
         protected override void WndProc(ref Message m)
@@ -36,7 +45,7 @@ namespace HostApp
             base.WndProc(ref m);
 
             var currentTime = DateTime.Now.ToString("HH:mm:ss.fff");
-            lstMessages.Items.Insert(0, $"{currentTime}: {m.Msg}");
+            lstMessages.Items.Insert(0, $"{currentTime}: {m.Msg} ({m.HWnd})");
 
             if (isEnablingProblems)
             {
@@ -65,7 +74,7 @@ namespace HostApp
             }
         }
 
-        public static int GetScrollPosition(ListBox listBox, bool horizontalBar)
+        public static int GetScrollPosition(System.Windows.Forms.ListBox listBox, bool horizontalBar)
         {
             int fnBar = ((!horizontalBar) ? 1 : 0);
             SCROLLINFO sCROLLINFO = new SCROLLINFO();
@@ -92,85 +101,77 @@ namespace HostApp
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            LoadAllPlugins();
+        }
+
+        private void LoadAllPlugins()
+        {
             var pluginDirectoriesPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             pluginDirectoriesPath = Path.Combine(pluginDirectoriesPath, PLUGIN_DIRECTORY_PATH);
-            
+
             if (!Directory.Exists(pluginDirectoriesPath))
             {
                 Directory.CreateDirectory(pluginDirectoriesPath);
             }
 
+            var mappingControlFactories = new List<MappingControlFactory>();
             var pluginDirectoryPaths = Directory.GetDirectories(pluginDirectoriesPath);
 
             foreach (var pluginDirectoryPath in pluginDirectoryPaths)
             {
-                LoadPlugin(pluginDirectoryPath);
+                mappingControlFactories.AddRange(LoadPlugin(pluginDirectoryPath));
             }
+
+            MappingControlRepository.Buffer(mappingControlFactories);
 
             DisplayPlugins();
         }
 
-        private static void LoadPlugin(string pluginDirectoryPath)
+        private IList<MappingControlFactory> LoadPlugin(string pluginDirectoryPath)
         {
             var pluginAssemblyName = Path.GetFileName(pluginDirectoryPath);
             var pluginAssemblyFileName = $"{pluginAssemblyName}.dll";
             var pluginAssemblyPath = Path.Combine(pluginDirectoryPath, pluginAssemblyFileName);
 
-            var sandboxDomainSetup = new AppDomainSetup
-            {
-                ApplicationBase = pluginDirectoryPath,
-            };
+            var pluginHost = new PluginHostProxy();
+            var pluginClassName = $"{pluginAssemblyName}.Plugin";
             
-            var evidence = new Evidence();
-            evidence.AddHostEvidence(new Zone(SecurityZone.Internet));
-
-            var permissions = SecurityManager.GetStandardSandbox(evidence);
-
-            // Required to instantiate Controls inside the plugin
-            permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, pluginDirectoryPath));
-            permissions.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, pluginDirectoryPath));
-            permissions.AddPermission(new UIPermission(UIPermissionWindow.AllWindows));
-
-            var sandboxDomain = AppDomain.CreateDomain("Sandbox", null, sandboxDomainSetup, permissions);
-            var pluginAssembly = AssemblyDefinition.ReadAssembly(pluginAssemblyPath);
-            var mappingControlFactories = new List<MappingControlFactory>();
-
-            foreach (var type in pluginAssembly.MainModule.Types)
+            if(!pluginHost.LoadPlugin(pluginAssemblyPath, pluginAssemblyName, pluginClassName))
             {
-                var cecilMappingControlAttribute = type.CustomAttributes.SingleOrDefault(ca => ca.AttributeType.Name == nameof(MappingControlAttribute));
-
-                if (cecilMappingControlAttribute == null)
-                {
-                    continue;
-                }
-
-                string title = string.Empty;
-                int order = 0;
-
-                foreach (var property in cecilMappingControlAttribute.Properties)
-                {
-                    if (property.Name == nameof(MappingControlAttribute.Title))
-                    {
-                        title = (string)property.Argument.Value;
-                    }
-                    else if (property.Name == nameof(MappingControlAttribute.Order))
-                    {
-                        order = (int)property.Argument.Value;
-                    }
-                }
-
-                var mappingControlFactory = new AppDomainMappingControlFactory(
-                    title,
-                    order,
-                    sandboxDomain,
-                    pluginAssemblyPath,
-                    type.FullName
-                );
-
-                mappingControlFactories.Add(mappingControlFactory);
+                pluginHost.Dispose();
+                throw new ApplicationException($"Failed to load plugin {pluginAssemblyPath}.");
             }
 
-            MappingControlRepository.Buffer(mappingControlFactories);
+            pluginHost.Disposing += PluginHost_Disposing;
+            proxiesToDispose.Add(pluginHost);
+
+            return pluginHost.GetMappingControlFactories();
+        }
+
+        private void PluginHost_Disposing(object sender, EventArgs e)
+        {
+            if (this.Disposing || this.IsDisposed)
+                return;
+
+            var pluginHost = (PluginHostProxy)sender;
+
+            if (proxiesToDispose.Contains(pluginHost))
+                proxiesToDispose.Remove(pluginHost);
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                if (this.Controls.Contains(tbcPlugins))
+                    this.Controls.Remove(tbcPlugins);
+
+                // This wont work, since the tabpage being removed causes a WndProc which triggers other dipsosed plugin controls to get called (which causes an error)
+                //if (tbcPlugins.TabPages.Contains(tabPage))
+                //    tbcPlugins.TabPages.Remove(tabPage);
+
+                // Trigger a rebuild for the tab control
+                LoadAllPlugins();
+
+                MessageBox.Show(this, $"A plugin unloaded unexpectedly, it may have crashed or been forcefully shut down. All plugins have been reloaded.", "Plugin unloaded unexpectedly!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            });
         }
 
         private void DisplayPlugins()
@@ -178,16 +179,26 @@ namespace HostApp
             var mappingControlFactories = MappingControlRepository.GetAllMappingControls();
             var sortedFactories = mappingControlFactories.OrderBy(f => f.Value.Order);
 
+            this.tbcPlugins = new System.Windows.Forms.TabControl();
+            this.tbcPlugins.Dock = DockStyle.Fill;
+            this.tbcPlugins.Location = new Point(0, 0);
+            this.tbcPlugins.Name = "tbcPlugins";
+            this.tbcPlugins.SelectedIndex = 0;
+            this.tbcPlugins.Size = new Size(800, 450);
+            this.tbcPlugins.TabIndex = 0;
+            this.Controls.Add(this.tbcPlugins);
+
             foreach (var mappingControlWithFactory in sortedFactories)
             {
                 var mappingControlTypeName = mappingControlWithFactory.Key;
-                var mappingControlFactory = mappingControlWithFactory.Value;
-                var mappingControl = mappingControlFactory.CreateInstance<Control>();
+                var mappingControlFactory = mappingControlWithFactory.Value as PluginMappingControlFactory; // hacks (easy access to properties and event) for quick testing
+                var mappingControl = mappingControlFactory.CreateInstance<System.Windows.Forms.Control>();
 
-                if (mappingControl is AbstractPluginUserControl abstractPluginControl)
+                // Plugin crashed during creation.
+                if (mappingControl == null)
                 {
-                    abstractPluginControl.AutoSize = true;
-                    mappingControl = new PluginHostControl(abstractPluginControl);
+                    MessageBox.Show(this, $"Plugin {mappingControlTypeName} failed to load.", "Plugin failed to load!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
 
                 // Give the form a moment to get to know the parent size
@@ -196,7 +207,7 @@ namespace HostApp
                 Task.Run(() =>
                 {
                     // Then maximize it, so it fills the parent
-                    Task.Delay(100).Wait();
+                    Task.Delay(150).Wait();
                     this.Invoke((MethodInvoker)delegate
                     {
                         mappingControl.Dock = DockStyle.Fill;
@@ -211,6 +222,98 @@ namespace HostApp
 
                 tbcPlugins.TabPages.Add(tabPage);
             }
+
+            tbcPlugins.SizeMode = TabSizeMode.Fixed;
+            tbcPlugins.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tbcPlugins.DrawItem += TbcPlugins_DrawItem;
+            tbcPlugins.MouseMove += TbcPlugins_MouseMove;
+            tbcPlugins.MouseLeave += TbcPlugins_MouseLeave;
+            tbcPlugins.MouseUp += TbcPlugins_MouseUp;
+            
+            // Only for DEBUG mode, where we display the console window.
+            this.BringToFront();
+        }
+
+        // Close button hack from https://stackoverflow.com/a/59214333
+        private int HoverIndex = -1;
+        
+        private void TbcPlugins_MouseUp(object sender, MouseEventArgs e)
+        {
+            for (int i = 0; i < tbcPlugins.TabCount; i++)
+            {
+                var rx = (Rectangle)tbcPlugins.TabPages[i].Tag;
+
+                if (rx.Contains(e.Location))
+                {
+                    tbcPlugins.TabPages[i].Dispose();
+                    return;
+                }
+            }
+        }
+
+        private void TbcPlugins_MouseMove(object sender, MouseEventArgs e)
+        {
+            for (int i = 0; i < tbcPlugins.TabCount; i++)
+            {
+                var rx = (Rectangle)tbcPlugins.TabPages[i].Tag;
+
+                if (rx.Contains(e.Location))
+                {
+                    //To avoid the redundant calls. 
+                    if (HoverIndex != i)
+                    {
+                        HoverIndex = i;
+                        tbcPlugins.Invalidate();
+                    }
+                    return;
+                }
+            }
+
+            //To avoid the redundant calls.
+            if (HoverIndex != -1)
+            {
+                HoverIndex = -1;
+                tbcPlugins.Invalidate();
+            }
+        }
+
+        private void TbcPlugins_MouseLeave(object sender, EventArgs e)
+        {
+            if (HoverIndex != -1)
+            {
+                HoverIndex = -1;
+                tbcPlugins.Invalidate();
+            }
+        }
+
+        private void TbcPlugins_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            var g = e.Graphics;
+            var tp = tbcPlugins.TabPages[e.Index];
+            var rt = e.Bounds;
+            var rx = new Rectangle(rt.Right - 20, (rt.Y + (rt.Height - 12)) / 2 + 1, 12, 12);
+
+            if ((e.State & DrawItemState.Selected) != DrawItemState.Selected)
+            {
+                rx.Offset(0, 2);
+            }
+
+            rt.Inflate(-rx.Width, 0);
+            rt.Offset(-(rx.Width / 2), 0);
+
+            using (Font f = new Font("Marlett", 8f))
+            using (StringFormat sf = new StringFormat()
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center,
+                Trimming = StringTrimming.EllipsisCharacter,
+                FormatFlags = StringFormatFlags.NoWrap,
+            })
+            {
+                g.DrawString(tp.Text, tp.Font ?? Font, Brushes.Black, rt, sf);
+                g.DrawString("r", f, HoverIndex == e.Index ? Brushes.Black : Brushes.LightGray, rx, sf);
+            }
+            tp.Tag = rx;
         }
     }
 }

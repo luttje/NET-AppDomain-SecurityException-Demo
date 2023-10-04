@@ -28,25 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tbcPlugins = new System.Windows.Forms.TabControl();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lstMessages = new System.Windows.Forms.ListBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.chkProblems = new System.Windows.Forms.CheckBox();
             this.lblHint = new System.Windows.Forms.Label();
             this.chkWorkaround = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // tbcPlugins
-            // 
-            this.tbcPlugins.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbcPlugins.Location = new System.Drawing.Point(0, 0);
-            this.tbcPlugins.Name = "tbcPlugins";
-            this.tbcPlugins.SelectedIndex = 0;
-            this.tbcPlugins.Size = new System.Drawing.Size(800, 450);
-            this.tbcPlugins.TabIndex = 0;
             // 
             // groupBox1
             // 
@@ -66,28 +57,29 @@
             this.lstMessages.FormattingEnabled = true;
             this.lstMessages.Location = new System.Drawing.Point(3, 16);
             this.lstMessages.Name = "lstMessages";
-            this.lstMessages.Size = new System.Drawing.Size(332, 299);
+            this.lstMessages.Size = new System.Drawing.Size(332, 257);
             this.lstMessages.TabIndex = 0;
             // 
             // panel1
             // 
             this.panel1.Controls.Add(this.chkProblems);
+            this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.lblHint);
             this.panel1.Controls.Add(this.chkWorkaround);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(3, 315);
+            this.panel1.Location = new System.Drawing.Point(3, 273);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(10);
-            this.panel1.Size = new System.Drawing.Size(332, 132);
+            this.panel1.Size = new System.Drawing.Size(332, 174);
             this.panel1.TabIndex = 1;
             // 
             // chkProblems
             // 
             this.chkProblems.AutoSize = true;
             this.chkProblems.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.chkProblems.Location = new System.Drawing.Point(10, 10);
+            this.chkProblems.Location = new System.Drawing.Point(10, 49);
             this.chkProblems.Name = "chkProblems";
-            this.chkProblems.Size = new System.Drawing.Size(312, 39);
+            this.chkProblems.Size = new System.Drawing.Size(312, 42);
             this.chkProblems.TabIndex = 0;
             this.chkProblems.Text = "Toggle Problems (by performing actions WndProc that cause SecurityExceptions when" +
     " call from across the AppDomain)";
@@ -98,7 +90,7 @@
             // 
             this.lblHint.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.lblHint.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHint.Location = new System.Drawing.Point(10, 49);
+            this.lblHint.Location = new System.Drawing.Point(10, 91);
             this.lblHint.Name = "lblHint";
             this.lblHint.Size = new System.Drawing.Size(312, 48);
             this.lblHint.TabIndex = 1;
@@ -109,7 +101,7 @@
             // chkWorkaround
             // 
             this.chkWorkaround.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.chkWorkaround.Location = new System.Drawing.Point(10, 97);
+            this.chkWorkaround.Location = new System.Drawing.Point(10, 139);
             this.chkWorkaround.Name = "chkWorkaround";
             this.chkWorkaround.Size = new System.Drawing.Size(312, 25);
             this.chkWorkaround.TabIndex = 2;
@@ -118,13 +110,24 @@
             this.chkWorkaround.Visible = false;
             this.chkWorkaround.CheckedChanged += new System.EventHandler(this.chkWorkaround_CheckedChanged);
             // 
+            // label1
+            // 
+            this.label1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(10, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(312, 39);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Note that the problems mentioned have been fixed in this branch :)";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.tbcPlugins);
             this.Name = "MainForm";
             this.Text = "Main Form - Sandboxer";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -137,13 +140,13 @@
 
         #endregion
 
-        private System.Windows.Forms.TabControl tbcPlugins;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ListBox lstMessages;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.CheckBox chkProblems;
         private System.Windows.Forms.Label lblHint;
         private System.Windows.Forms.CheckBox chkWorkaround;
+        private System.Windows.Forms.Label label1;
     }
 }
 

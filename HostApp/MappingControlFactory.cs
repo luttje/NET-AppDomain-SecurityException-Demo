@@ -54,23 +54,21 @@ namespace HostApp
     /// <summary>
     /// Creates the Control using the specified AppDomain.
     /// </summary>
-    public class AppDomainMappingControlFactory : MappingControlFactory
+    internal class PluginMappingControlFactory : MappingControlFactory
     {
-        public AppDomain appDomain;
-        public string pluginAssemblyPath;
+        private PluginHostProxy pluginHost;
         private string controlTypeName;
 
-        public AppDomainMappingControlFactory(string title, int order, AppDomain appDomain, string pluginAssemblyPath, string controlTypeName)
+        internal PluginMappingControlFactory(string title, int order, PluginHostProxy pluginHost, string controlTypeName)
             : base(title, order)
         {
-            this.appDomain = appDomain;
-            this.pluginAssemblyPath = pluginAssemblyPath;
+            this.pluginHost = pluginHost;
             this.controlTypeName = controlTypeName;
         }
 
         public override T CreateInstance<T>()
         {
-            return (T)appDomain.CreateInstanceFromAndUnwrap(pluginAssemblyPath, controlTypeName);
+            return (T)pluginHost.CreateControl(controlTypeName);
         }
 
         /// <summary>

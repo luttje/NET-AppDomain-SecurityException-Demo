@@ -1,6 +1,7 @@
 ﻿using SharedInterfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -26,12 +27,7 @@ namespace ClientPlugin
         [DllImport("user32.dll")]
         public static extern IntPtr SendMessage(IntPtr hwnd, uint Msg, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("user32.dll")]
-        internal extern static int GetSystemMetrics(int metric);
-
         public int DesiredHeight { get; set; } = 50;
-
-        private const int SM_CMONITORS = 80;
 
         private const int WM_USER = 0x0400;
         private const int WM_BTNCLICKED = WM_USER + 1;
@@ -48,7 +44,8 @@ namespace ClientPlugin
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(GetSystemMetrics(SM_CMONITORS).ToString());
+            MessageBox.Show("Writing file...");
+            File.WriteAllText("D:/write-test.txt", "Test for plugin. This file can be safely removed.");
         }
     }
 }

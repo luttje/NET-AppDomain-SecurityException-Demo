@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostApp", "HostApp\HostApp.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientPlugin", "ClientPlugin\ClientPlugin.csproj", "{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginLoader", "PluginLoader\PluginLoader.csproj", "{28FD937C-CCA7-4E85-A29B-D723E8390E51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FBE1B2B-4E5B-42D8-AC10-C3492E384E07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28FD937C-CCA7-4E85-A29B-D723E8390E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28FD937C-CCA7-4E85-A29B-D723E8390E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28FD937C-CCA7-4E85-A29B-D723E8390E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28FD937C-CCA7-4E85-A29B-D723E8390E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

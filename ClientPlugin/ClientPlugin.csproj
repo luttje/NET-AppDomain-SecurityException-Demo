@@ -53,6 +53,7 @@
     <Compile Include="MyPluginUserControl.xaml.cs">
       <DependentUpon>MyPluginUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
-        <Button Click="Button_Click">Send WndProc Message manually (and crash app)</Button>
-        <Button Click="Button_Click_1">Test GetSystemMetrics (and crash app)</Button>
+        <Button Click="Button_Click">Send WndProc Message manually (uses Native method so should fail)</Button>
+        <Button Click="Button_Click_1">Test writing a file (IO is restricted so should fail)</Button>
     </StackPanel>
 </UserControl>
